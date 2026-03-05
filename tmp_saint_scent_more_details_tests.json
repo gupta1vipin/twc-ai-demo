@@ -1,0 +1,46 @@
+[
+  {
+    "step": "search_saint_products",
+    "cookie": "twc_ai_demo_sid=489efa01-5eb2-49b6-8c94-5a6beac9c04d",
+    "status": 200,
+    "reply": "Here are the top results for “scent products”.",
+    "action": null,
+    "hasProductSummary": false,
+    "productSummaryCode": null,
+    "productsCount": 22,
+    "lastQuery": null
+  },
+  {
+    "step": "search_fragrance_scent",
+    "cookie": "twc_ai_demo_sid=489efa01-5eb2-49b6-8c94-5a6beac9c04d",
+    "status": 200,
+    "reply": "Here are the top results for “scent”.",
+    "action": null,
+    "hasProductSummary": false,
+    "productSummaryCode": null,
+    "productsCount": 23,
+    "lastQuery": null
+  },
+  {
+    "step": "more_details_first_product",
+    "cookie": "twc_ai_demo_sid=489efa01-5eb2-49b6-8c94-5a6beac9c04d",
+    "status": 200,
+    "reply": "Here’s a quick summary of “Car Scenting Diffuser – Black”.",
+    "action": null,
+    "hasProductSummary": true,
+    "productSummaryCode": "A12468",
+    "productsCount": null,
+    "lastQuery": null
+  },
+  {
+    "step": "more_details_sku_spaced",
+    "cookie": "twc_ai_demo_sid=489efa01-5eb2-49b6-8c94-5a6beac9c04d",
+    "status": 200,
+    "reply": "I couldn't find products for “show more details for SKU s y dfo”. Try a different keyword.",
+    "action": null,
+    "hasProductSummary": false,
+    "productSummaryCode": null,
+    "productsCount": 0,
+    "lastQuery": null
+  }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "step": "search_blue_shirt",
+    "status": 200,
+    "reply": "Here are the top results for “blue shirt”.",
+    "action": null,
+    "hasProductSummary": false,
+    "productSummaryCode": null,
+    "productsCount": 8
+  },
+  {
+    "step": "tell_me_more_first_product_a15239",
+    "status": 200,
+    "reply": "Here’s a quick summary of “The Perfect Organic Cotton Rib Side Shirt”.",
+    "action": null,
+    "hasProductSummary": true,
+    "productSummaryCode": "A15239",
+    "productsCount": null
+  }
+]

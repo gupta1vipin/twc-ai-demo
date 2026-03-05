@@ -1,0 +1,22 @@
+[
+  {
+    "step": "search_scent",
+    "cookie": "twc_ai_demo_sid=8f671bc0-07f5-4ec9-9692-e290213642fa",
+    "status": 200,
+    "reply": "Here are the top results for “scent”.",
+    "action": null,
+    "hasProductSummary": false,
+    "productSummaryCode": null,
+    "productsCount": 23
+  },
+  {
+    "step": "show_more_details_sku_spaced",
+    "cookie": "twc_ai_demo_sid=8f671bc0-07f5-4ec9-9692-e290213642fa",
+    "status": 200,
+    "reply": "TWC product API error (404). I can still show the product link if you search for it.",
+    "action": null,
+    "hasProductSummary": false,
+    "productSummaryCode": null,
+    "productsCount": null
+  }
+]

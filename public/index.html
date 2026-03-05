@@ -1,0 +1,1806 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Agentic Commerce - TWC AI Demo</title>
+  <style>
+    :root{
+      /* Neutral, minimalist palette (inspired by luxury retail, not a 1:1 copy). */
+      --agent-bg:#111111;
+      --agent-accent:#111111;
+      --agent-text:#111111;
+      --agent-muted:rgba(17,17,17,0.60);
+      --agent-panel:#ffffff;
+      --agent-panel-contrast:#faf7f2;
+      --page-bg:#fbf9f5;
+      --surface:#ffffff;
+      --surface-2:rgba(255,255,255,0.86);
+      --border:rgba(17,17,17,0.10);
+      --shadow:0 18px 50px rgba(0,0,0,0.14);
+      --shadow-soft:0 10px 30px rgba(0,0,0,0.10);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Inter,Arial,sans-serif;
+      margin:0;
+      padding:28px 18px 90px;
+      background:radial-gradient(1200px 500px at 18% 0%, rgba(17,17,17,0.04), transparent 60%),
+             radial-gradient(900px 420px at 85% 18%, rgba(17,17,17,0.03), transparent 55%),
+             var(--page-bg);
+      color:var(--agent-text);
+      line-height:1.45;
+      position:relative;
+      overflow-x:hidden;
+    }
+
+    /* Subtle demo background illustration (embedded SVG; avoids external 404s) */
+    body::before{
+      content:"";
+      position:fixed;
+      inset:-40px;
+      background-image:
+        linear-gradient(180deg, rgba(244,248,252,0.92), rgba(244,248,252,0.99)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1600' height='900' viewBox='0 0 1600 900'%3E%3Cdefs%3E%3CradialGradient id='g1' cx='30%25' cy='0%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%2300aaff' stop-opacity='0.16'/%3E%3Cstop offset='100%25' stop-color='%2300aaff' stop-opacity='0'/%3E%3C/radialGradient%3E%3CradialGradient id='g2' cx='85%25' cy='20%25' r='55%25'%3E%3Cstop offset='0%25' stop-color='%230070c0' stop-opacity='0.14'/%3E%3Cstop offset='100%25' stop-color='%230070c0' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='1600' height='900' fill='white'/%3E%3Crect width='1600' height='900' fill='url(%23g1)'/%3E%3Crect width='1600' height='900' fill='url(%23g2)'/%3E%3C!-- Journey path --%3E%3Cpath d='M120 740 C 380 540, 520 610, 760 440 S 1260 300, 1490 130' fill='none' stroke='%230070c0' stroke-opacity='0.20' stroke-width='6' stroke-linecap='round' stroke-dasharray='10 14'/%3E%3C!-- Nodes --%3E%3Cg fill='%2300aaff' fill-opacity='0.22' stroke='%230070c0' stroke-opacity='0.25'%3E%3Ccircle cx='120' cy='740' r='16'/%3E%3Ccircle cx='520' cy='610' r='16'/%3E%3Ccircle cx='760' cy='440' r='16'/%3E%3Ccircle cx='1100' cy='330' r='16'/%3E%3Ccircle cx='1490' cy='130' r='16'/%3E%3C/g%3E%3C!-- Simple icons: chat bubbles + cart (abstract, not brand) --%3E%3Cg stroke='%2304273a' stroke-opacity='0.22' fill='none' stroke-width='3'%3E%3Cpath d='M210 700 h150 a18 18 0 0 1 18 18 v54 a18 18 0 0 1-18 18 h-58 l-22 18 v-18 h-70 a18 18 0 0 1-18-18 v-54 a18 18 0 0 1 18-18 z'/%3E%3Cpath d='M610 560 h170 a18 18 0 0 1 18 18 v58 a18 18 0 0 1-18 18 h-78 l-24 18 v-18 h-68 a18 18 0 0 1-18-18 v-58 a18 18 0 0 1 18-18 z'/%3E%3Cpath d='M880 395 h170 a18 18 0 0 1 18 18 v58 a18 18 0 0 1-18 18 h-86 l-24 18 v-18 h-60 a18 18 0 0 1-18-18 v-58 a18 18 0 0 1 18-18 z'/%3E%3Cpath d='M1190 285 h140 l20 120 h-180 l20-120 z'/%3E%3Cpath d='M1210 285 c0-22 18-40 40-40 h30 c22 0 40 18 40 40'/%3E%3Ccircle cx='1235' cy='420' r='10'/%3E%3Ccircle cx='1315' cy='420' r='10'/%3E%3C/g%3E%3C!-- Subtle grid dots --%3E%3Cg fill='%2304273a' fill-opacity='0.06'%3E%3Ccircle cx='260' cy='220' r='3'/%3E%3Ccircle cx='320' cy='260' r='3'/%3E%3Ccircle cx='380' cy='200' r='3'/%3E%3Ccircle cx='1240' cy='620' r='3'/%3E%3Ccircle cx='1320' cy='660' r='3'/%3E%3Ccircle cx='1400' cy='600' r='3'/%3E%3C/g%3E%3C/svg%3E");
+      background-size:cover;
+      background-position:center;
+      opacity:0.22;
+      filter:grayscale(1);
+      z-index:-1;
+      pointer-events:none;
+    }
+
+    body.twc-bg::before{
+      background-image:none;
+      opacity:0;
+      filter:none;
+    }
+
+    /* If you provide public/twc.png, it will be used as the full-page background image. */
+    body.twc-bg::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      background-image:url('/twc.png');
+      background-size:cover;
+      background-position:top center;
+      background-repeat:no-repeat;
+      opacity:0.95;
+      z-index:-2;
+      pointer-events:none;
+    }
+
+    .demo-overlay{
+      position:fixed;
+      top:12px;
+      right:12px;
+      z-index:30;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,0.82);
+      backdrop-filter:blur(8px);
+      color:var(--agent-text);
+      font-size:12px;
+      letter-spacing:0.1px;
+      box-shadow:var(--shadow-soft);
+      user-select:none;
+    }
+    a{color:inherit}
+    .container{max-width:1100px;margin:0 auto}
+
+    .topbar{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      padding:18px 18px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background:linear-gradient(180deg,var(--surface),var(--surface-2));
+      box-shadow:var(--shadow-soft);
+      backdrop-filter:blur(8px);
+    }
+
+    .topbar-right{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+    .logos{display:flex;align-items:center;gap:10px}
+    .logo-badge{
+      height:24px;
+      padding:0 10px;
+      display:inline-flex;
+      align-items:center;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,0.70);
+      box-shadow:0 10px 22px rgba(2,30,60,0.06);
+    }
+    .logo-badge svg{display:block;height:14px;width:auto;opacity:0.92}
+
+    .partner-logos{
+      position:fixed;
+      left:18px;
+      bottom:18px;
+      z-index:20;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      pointer-events:none;
+    }
+    .partner-logos .logo-badge{pointer-events:none}
+    .partner-logos .logo-badge{height:34px;padding:0 14px}
+    .partner-logos .logo-badge svg{height:18px}
+
+    .hero{
+      margin:18px 0 0;
+      border-radius:14px;
+      overflow:hidden;
+      box-shadow:var(--shadow-soft);
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.40));
+      backdrop-filter:blur(8px);
+    }
+    .hero-inner{padding:18px}
+    .hero-title{margin:0;font-size:14px;font-weight:800;letter-spacing:-0.1px}
+    .hero-sub{margin:6px 0 0;color:rgba(4,39,58,0.72);font-size:12px}
+    .hero-art{margin-top:12px;border-radius:12px;overflow:hidden;border:1px solid rgba(6,58,95,0.10)}
+
+    .brand{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .brand h1{margin:0;font-size:18px;letter-spacing:-0.2px}
+    .brand p{margin:0;color:rgba(4,39,58,0.75);font-size:13px;max-width:70ch}
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(17,17,17,0.14);
+      background:rgba(17,17,17,0.04);
+      color:rgba(17,17,17,0.84);
+      font-size:12px;
+      white-space:nowrap;
+    }
+    .dot{width:8px;height:8px;border-radius:999px;background:var(--agent-accent);box-shadow:0 0 0 3px rgba(17,17,17,0.10)}
+
+    /* Floating chat button */
+    .chat-widget {
+      position:fixed;right:20px;bottom:20px;z-index:9999;display:flex;flex-direction:column;align-items:flex-end;
+    }
+
+    .chat-button {
+      background:linear-gradient(180deg,var(--agent-bg),#2a2a2a);
+      color:#fff;
+      border:1px solid rgba(255,255,255,0.18);
+      border-radius:50%;
+      width:64px;height:64px;
+      box-shadow:0 14px 38px rgba(0,0,0,0.24);
+      cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      font-weight:800;
+      font-size:12px;
+      letter-spacing:0.2px;
+    }
+
+    .chat-panel {
+      width:820px;
+      max-width:calc(100vw - 40px);
+      height:640px;
+      background:linear-gradient(180deg,var(--agent-panel),var(--agent-panel-contrast));
+      color:var(--agent-text);
+      border-radius:16px;
+      padding:12px;
+      margin-bottom:12px;
+      box-shadow:var(--shadow);
+      border:1px solid var(--border);
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+      transform-origin:bottom right;
+      position:relative;
+    }
+
+    .resize-handle{
+      position:absolute;
+      left:0;
+      top:54px;
+      bottom:54px;
+      width:12px;
+      height:auto;
+      border-radius:8px;
+      border:1px solid var(--border);
+      background:
+        linear-gradient(90deg, rgba(0,0,0,0.08), transparent 60%),
+        repeating-linear-gradient(180deg, rgba(17,17,17,0.20), rgba(17,17,17,0.20) 2px, transparent 2px, transparent 6px),
+        rgba(255,255,255,0.18);
+      cursor:ew-resize;
+      user-select:none;
+      touch-action:none;
+      backdrop-filter:blur(6px);
+      opacity:0.45;
+    }
+
+    .resize-handle:hover{opacity:0.85}
+
+    .fullscreen .resize-handle{display:none}
+
+    .chat-header{display:flex;align-items:center;justify-content:space-between;padding:8px 6px 10px}
+    .chat-title{display:flex;flex-direction:column;gap:2px}
+    .chat-title strong{font-size:13px;font-weight:800;letter-spacing:-0.1px}
+    .chat-title span{font-size:12px;color:rgba(4,39,58,0.72)}
+    .chat-controls{display:flex;align-items:center;gap:6px}
+    .chat-controls button{
+      background:rgba(255,255,255,0.55);
+      border:1px solid var(--border);
+      color:rgba(4,39,58,0.75);
+      cursor:pointer;
+      width:32px;height:32px;
+      border-radius:10px;
+      display:inline-flex;align-items:center;justify-content:center;
+    }
+    .chat-controls button:hover{background:rgba(255,255,255,0.75)}
+
+    .chat-body{
+      flex:1;
+      overflow:auto;
+      padding:10px 6px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      scrollbar-width:thin;
+    }
+    .message{max-width:78%;padding:10px 12px;border-radius:14px;font-size:13px}
+    .message.user{align-self:flex-end;background:rgba(17,17,17,0.06);color:var(--agent-text);border:1px solid var(--border);border-bottom-right-radius:6px}
+    .message.agent{align-self:flex-start;background:linear-gradient(90deg,var(--agent-bg),#2a2a2a);color:#fff;border-bottom-left-radius:6px}
+
+    .message.agent.light{background:rgba(255,255,255,0.86);color:var(--agent-text);border:1px solid var(--border)}
+
+    .results-head{
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:10px;
+      margin:0 0 10px 0;
+      padding:2px 2px 8px;
+      border-bottom:1px solid var(--border);
+    }
+    .results-head strong{font-size:12px;letter-spacing:0.2px}
+    .results-head span{font-size:12px;color:var(--agent-muted)}
+
+    .results-foot{
+      margin-top:10px;
+      padding-top:8px;
+      border-top:1px solid var(--border);
+      color:var(--agent-muted);
+      font-size:12px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    .thinking{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+    }
+    .dots{display:inline-flex;gap:6px;align-items:center}
+    .dots span{width:7px;height:7px;border-radius:999px;background:rgba(255,255,255,0.75);opacity:0.6;animation:bounce 1.1s infinite}
+    .dots span:nth-child(2){animation-delay:0.12s}
+    .dots span:nth-child(3){animation-delay:0.24s}
+    @keyframes bounce{0%,100%{transform:translateY(0);opacity:0.55}50%{transform:translateY(-4px);opacity:0.95}}
+
+    .tiles{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-top:10px;
+      overflow-x:visible;
+      padding-bottom:2px;
+    }
+    .tile{
+      background:rgba(255,255,255,0.75);
+      border:1px solid rgba(6,58,95,0.12);
+      border-radius:14px;
+      padding:12px;
+      color:var(--agent-text);
+      display:flex;
+      gap:12px;
+      align-items:center;
+      width:100%;
+      min-width:0;
+      max-width:none;
+    }
+    .tile-media{
+      width:84px;
+      height:84px;
+      border-radius:12px;
+      border:1px solid rgba(6,58,95,0.10);
+      background:rgba(255,255,255,0.70);
+      overflow:hidden;
+      flex:0 0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .tile-media img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+    }
+    .tile-content{flex:1;min-width:0}
+    .tile h4{margin:0 0 6px;font-size:14px;line-height:1.2}
+    .tile-summary h4{font-size:15px}
+    .rating-line{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:12px;color:rgba(4,39,58,0.72);margin:0 0 6px}
+    .stars{letter-spacing:1px;font-weight:900;color:rgba(4,39,58,0.90)}
+    .tile-summary .summary{margin:6px 0 0;color:rgba(4,39,58,0.82);font-size:12px;line-height:1.35}
+    .meta{display:flex;flex-wrap:wrap;gap:10px;color:rgba(4,39,58,0.70);font-size:12px;margin:0}
+    .meta b{color:rgba(4,39,58,0.82)}
+    .tile-actions{display:flex;flex-direction:column;gap:8px;align-items:stretch;justify-content:center;flex:0 0 168px}
+    .tile-actions button,
+    .tile-actions a{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+      border:1px solid rgba(6,58,95,0.14);
+      padding:9px 10px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:800;
+      font-size:12px;
+    }
+    .tile-actions .primary{
+      background:var(--agent-bg);
+      border-color:rgba(17,17,17,0.16);
+      color:#fff;
+    }
+    .tile-actions .secondary{
+      background:rgba(255,255,255,0.65);
+      color:rgba(4,39,58,0.80);
+    }
+    .tile-actions button:disabled{opacity:0.65;cursor:not-allowed}
+
+
+    .refine{display:flex;flex-direction:column;gap:8px}
+    .refine-row{display:flex;flex-wrap:wrap;gap:6px}
+    .chip{
+      border:1px solid rgba(6,58,95,0.14);
+      background:rgba(255,255,255,0.65);
+      color:rgba(4,39,58,0.82);
+      border-radius:999px;
+      padding:6px 9px;
+      font-size:11px;
+      cursor:pointer;
+      user-select:none;
+    }
+    .chip[aria-pressed="true"]{
+      border-color:rgba(0,170,255,0.55);
+      box-shadow:0 0 0 4px rgba(0,170,255,0.14);
+    }
+    .refine-actions{display:flex;gap:8px}
+    .refine-actions button{
+      flex:1;
+      border:1px solid rgba(6,58,95,0.14);
+      background:rgba(255,255,255,0.65);
+      color:rgba(4,39,58,0.80);
+      border-radius:12px;
+      padding:9px 10px;
+      cursor:pointer;
+      font-weight:800;
+      font-size:12px;
+    }
+    .refine-actions button.primary{
+      background:var(--agent-bg);
+      border-color:rgba(17,17,17,0.16);
+      color:#fff;
+    }
+
+    @media (max-width:420px){
+      .tiles{flex-direction:column;overflow-x:visible}
+      .tile{min-width:unset;max-width:unset}
+    }
+
+    .chat-input{display:flex;gap:8px;padding:10px 6px 6px;border-top:1px solid rgba(6,58,95,0.10)}
+    .chat-input .icon-btn{
+      width:44px;
+      min-width:44px;
+      height:44px;
+      border-radius:12px;
+      border:1px solid rgba(6,58,95,0.14);
+      background:rgba(255,255,255,0.65);
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      color:rgba(4,39,58,0.80);
+      padding:0;
+      user-select:none;
+      touch-action:manipulation;
+    }
+    .chat-input .icon-btn:hover{background:rgba(255,255,255,0.80)}
+    .chat-input .icon-btn:active{transform:translateY(1px)}
+    .chat-input .icon-btn:disabled{opacity:0.55;cursor:not-allowed}
+    .chat-input .icon-btn[aria-pressed="true"]{
+      border-color:rgba(0,170,255,0.55);
+      box-shadow:0 0 0 4px rgba(0,170,255,0.14);
+    }
+    .chat-input .icon-btn svg{width:18px;height:18px}
+    .chat-input input{
+      flex:1;
+      padding:11px 12px;
+      border-radius:12px;
+      border:1px solid rgba(6,58,95,0.14);
+      background:rgba(255,255,255,0.65);
+      color:var(--agent-text);
+      outline:none;
+    }
+    .chat-input input:focus{border-color:rgba(0,170,255,0.55);box-shadow:0 0 0 4px rgba(0,170,255,0.14)}
+    .chat-input button{
+      background:var(--agent-bg);
+      border:1px solid rgba(17,17,17,0.16);
+      color:#fff;
+      padding:11px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:800;
+    }
+
+    .minimized-panel{width:64px;height:64px;border-radius:50%;background:linear-gradient(180deg,var(--agent-bg),#005fb8);display:flex;align-items:center;justify-content:center;color:var(--agent-text);box-shadow:0 8px 24px rgba(0,112,192,0.12)}
+
+    /* Fullscreen mode */
+    .fullscreen{position:fixed;right:0;bottom:0;left:0;top:0;width:100%;height:100%;border-radius:0;max-width:none;max-height:none}
+
+    /* Responsive tweaks */
+    @media (max-width:420px){.chat-panel{width:100%;height:100%;right:0;left:0;bottom:0;top:0;border-radius:0}.resize-handle{display:none}}
+</style>
+</head>
+<body>
+  <div class="demo-overlay">localhost • demo • agentic commerce • ui: variant-picker-2026-03-05</div>
+  <!--<div class="container">
+    <div class="topbar">
+      <div class="brand">
+        <h1>Agentic Commerce — TWC AI Demo</h1>
+        <p>Use the assistant (bottom-right) to search products and add items to your cart. Example: “show me cameras” or “add 12345”.</p>
+      </div>
+      <div class="topbar-right">
+        <div class="badge" title="Local demo server">
+          <span class="dot" aria-hidden="true"></span>
+          <span>Demo running on localhost</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero" role="img" aria-label="Agentic commerce journey illustration">
+      <div class="hero-inner">
+        <p class="hero-title">Agentic Commerce Journey</p>
+        <p class="hero-sub">Intent → product discovery → comparison → add to cart → checkout support</p>
+        <div class="hero-art">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 320" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <linearGradient id="hbg" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#ffffff" stop-opacity="0.95"/>
+                <stop offset="1" stop-color="#d3eefc" stop-opacity="0.75"/>
+              </linearGradient>
+              <linearGradient id="hline" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#00aaff" stop-opacity="0.35"/>
+                <stop offset="1" stop-color="#0070C0" stop-opacity="0.30"/>
+              </linearGradient>
+            </defs>
+
+            <rect x="0" y="0" width="1100" height="320" rx="18" fill="url(#hbg)"/>
+
+            <path d="M60 250 C 230 140, 340 210, 500 140 S 820 95, 1040 70" fill="none" stroke="url(#hline)" stroke-width="10" stroke-linecap="round" stroke-dasharray="14 16"/>
+
+            <g fill="#00aaff" fill-opacity="0.18" stroke="#0070C0" stroke-opacity="0.22" stroke-width="2">
+              <circle cx="60" cy="250" r="18"/>
+              <circle cx="340" cy="210" r="18"/>
+              <circle cx="500" cy="140" r="18"/>
+              <circle cx="760" cy="110" r="18"/>
+              <circle cx="1040" cy="70" r="18"/>
+            </g>
+
+            <g stroke="#04273a" stroke-opacity="0.24" fill="none" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+              <path d="M130 210 h170 a18 18 0 0 1 18 18 v48 a18 18 0 0 1-18 18 h-74 l-22 16 v-16 h-74 a18 18 0 0 1-18-18 v-48 a18 18 0 0 1 18-18 z"/>
+              <path d="M162 242 h108"/>
+              <path d="M162 262 h86"/>
+
+              <rect x="410" y="168" width="130" height="96" rx="14"/>
+              <rect x="560" y="150" width="130" height="114" rx="14"/>
+              <path d="M432 200 h86"/>
+              <path d="M582 186 h86"/>
+
+              <path d="M840 120 h150 l18 92 h-180 l18-92 z"/>
+              <path d="M858 120 c0-20 16-36 36-36 h30 c20 0 36 16 36 36"/>
+              <circle cx="880" cy="232" r="10"/>
+              <circle cx="950" cy="232" r="10"/>
+            </g>
+
+            <g font-family="ui-sans-serif,system-ui,Segoe UI,Arial" font-size="12" fill="rgba(4,39,58,0.70)" font-weight="700">
+              <text x="40" y="286">Intent</text>
+              <text x="296" y="286">Search</text>
+              <text x="470" y="286">Compare</text>
+              <text x="738" y="286">Add to cart</text>
+              <text x="990" y="286">Checkout</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>-->
+
+  <div class="partner-logos" aria-label="Partner logos">
+    <span class="logo-badge" title="SAP">
+      <svg viewBox="0 0 52 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="0" y="0" width="52" height="18" rx="6" fill="rgba(0,112,192,0.14)"/>
+        <text x="26" y="12" text-anchor="middle" font-family="ui-sans-serif,system-ui,Segoe UI,Arial" font-weight="800" font-size="10" fill="rgba(4,39,58,0.82)">SAP</text>
+      </svg>
+    </span>
+    <span class="logo-badge" title="IBM">
+      <svg viewBox="0 0 52 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="0" y="0" width="52" height="18" rx="6" fill="rgba(0,170,255,0.14)"/>
+        <text x="26" y="12" text-anchor="middle" font-family="ui-sans-serif,system-ui,Segoe UI,Arial" font-weight="800" font-size="10" fill="rgba(4,39,58,0.82)">IBM</text>
+      </svg>
+    </span>
+  </div>
+
+  <div class="chat-widget" id="chatWidget">
+    <div class="chat-panel" id="chatPanel" aria-hidden="false">
+      <div class="chat-header">
+        <div class="chat-title">
+          <strong>AI Commerce Assistant</strong>
+          <span>Search products • Demo cart • Demo checkout</span>
+        </div>
+        <div class="chat-controls">
+          <button id="minimizeBtn" title="Minimize">_</button>
+          <button id="fullscreenBtn" title="Toggle Fullscreen">[ ]</button>
+        </div>
+      </div>
+      <div class="chat-body" id="chatBody">
+        <div class="message agent">Welcome! what can I do for you?</div>
+      </div>
+      <form id="widgetForm" class="chat-input">
+        <button id="micBtn" class="icon-btn" type="button" title="Voice input" aria-label="Voice input" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M12 14a3 3 0 0 0 3-3V7a3 3 0 0 0-6 0v4a3 3 0 0 0 3 3Z" stroke="currentColor" stroke-width="2"/>
+            <path d="M19 11a7 7 0 0 1-14 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M12 18v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M8 21h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <input id="widgetInput" autocomplete="off" placeholder="Ask about products, or type “add <sku>”" />
+        <button type="submit">Send</button>
+      </form>
+
+      <div class="resize-handle" id="resizeHandle" title="Drag to resize" aria-hidden="true"></div>
+    </div>
+
+    <button class="chat-button" id="openBtn" aria-label="Open chat" style="display:none">AI</button>
+  </div>
+
+  <script>
+    const chatWidget = document.getElementById('chatWidget');
+    const chatPanel = document.getElementById('chatPanel');
+    const openBtn = document.getElementById('openBtn');
+    const minimizeBtn = document.getElementById('minimizeBtn');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const chatBody = document.getElementById('chatBody');
+    const widgetForm = document.getElementById('widgetForm');
+    const widgetInput = document.getElementById('widgetInput');
+    const resizeHandle = document.getElementById('resizeHandle');
+    const micBtn = document.getElementById('micBtn');
+
+    // Feature toggle: hide multi-select facet filters in chat responses (code remains, UI hidden).
+    const SHOW_REFINE_CONTROLS = false;
+
+    let minimized = false;
+    let fullscreen = false;
+    let savedSize = null;
+
+    function showPanel(){ chatPanel.style.display='flex'; openBtn.style.display='none'; chatPanel.setAttribute('aria-hidden','false'); }
+    function hidePanel(){ chatPanel.style.display='none'; openBtn.style.display='flex'; chatPanel.setAttribute('aria-hidden','true'); }
+
+    // Initialize minimized (user clicks chat bubble to open)
+    minimized = true;
+    hidePanel();
+
+    // Page background image (only if you provide public/twc.png).
+    (function enableTwcBg(){
+      const img = new Image();
+      img.onload = ()=> document.body.classList.add('twc-bg');
+      img.onerror = ()=> {};
+      img.src = '/twc.png';
+    })();
+
+    minimizeBtn.addEventListener('click', ()=>{
+      minimized = !minimized;
+      if(minimized){ chatPanel.style.display='none'; openBtn.style.display='flex'; } else { showPanel(); }
+    });
+
+    openBtn.addEventListener('click', ()=>{ minimized=false; showPanel(); widgetInput.focus(); });
+
+    fullscreenBtn.addEventListener('click', ()=>{
+      fullscreen = !fullscreen;
+      if(fullscreen){
+        // Preserve manual size so we can restore it later
+        savedSize = {
+          width: chatPanel.style.width || '',
+          height: chatPanel.style.height || ''
+        };
+        chatPanel.classList.add('fullscreen');
+        chatPanel.style.width = '';
+        chatPanel.style.height = '';
+      } else {
+        chatPanel.classList.remove('fullscreen');
+        if(savedSize){
+          chatPanel.style.width = savedSize.width;
+          chatPanel.style.height = savedSize.height;
+        }
+      }
+    });
+
+    // Resizable chat panel (drag from left edge; horizontal resize).
+    (function enableResize(){
+      if(!resizeHandle) return;
+      let resizing = false;
+      let startX = 0;
+      let startW = 0;
+
+      function clamp(value, min, max){
+        return Math.max(min, Math.min(max, value));
+      }
+
+      resizeHandle.addEventListener('pointerdown', (e)=>{
+        if(fullscreen) return;
+        resizing = true;
+        resizeHandle.setPointerCapture(e.pointerId);
+        const rect = chatPanel.getBoundingClientRect();
+        startX = e.clientX;
+        startW = rect.width;
+        e.preventDefault();
+      });
+
+      resizeHandle.addEventListener('pointermove', (e)=>{
+        if(!resizing) return;
+
+        // Handle is on the left; drag left to grow, right to shrink.
+        const dx = startX - e.clientX;
+
+        const maxW = Math.max(420, window.innerWidth - 40);
+        const newW = clamp(startW + dx, 420, maxW);
+
+        chatPanel.style.width = `${Math.round(newW)}px`;
+      });
+
+      resizeHandle.addEventListener('pointerup', ()=>{ resizing = false; });
+      resizeHandle.addEventListener('pointercancel', ()=>{ resizing = false; });
+    })();
+
+    function appendMessage(text, cls='agent'){
+      const el = document.createElement('div');
+      el.className = 'message ' + cls;
+      el.innerText = text;
+      chatBody.appendChild(el);
+      chatBody.scrollTop = chatBody.scrollHeight;
+      return el;
+    }
+
+    function appendThinking(labelText = 'Working'){
+      const el = document.createElement('div');
+      el.className = 'message agent';
+      const wrap = document.createElement('div');
+      wrap.className = 'thinking';
+      const dots = document.createElement('div');
+      dots.className = 'dots';
+      dots.innerHTML = '<span></span><span></span><span></span>';
+      const label = document.createElement('div');
+      label.innerText = labelText;
+      wrap.appendChild(dots);
+      wrap.appendChild(label);
+      el.appendChild(wrap);
+      chatBody.appendChild(el);
+      chatBody.scrollTop = chatBody.scrollHeight;
+      return el;
+    }
+
+    function appendMiniCart(miniCart){
+      if(!miniCart || typeof miniCart !== 'object') return;
+
+      const p = miniCart.product || {};
+      const base = miniCart.basePrice || {};
+      const total = miniCart.totalPrice || {};
+
+      const container = document.createElement('div');
+      container.className = 'message agent light';
+
+      const grid = document.createElement('div');
+      grid.className = 'tiles';
+
+      const tile = document.createElement('div');
+      tile.className = 'tile tile-summary';
+
+      const media = document.createElement('div');
+      media.className = 'tile-media';
+      if(p.image){
+        const img = document.createElement('img');
+        img.loading = 'lazy';
+        img.alt = p.name || 'Product image';
+        img.src = p.image;
+        media.appendChild(img);
+      }
+
+      const content = document.createElement('div');
+      content.className = 'tile-content';
+
+      const title = document.createElement('h4');
+      title.innerText = p.name || 'Added to bag';
+
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+
+      const skuLine = document.createElement('div');
+      skuLine.innerHTML = `<b>SKU:</b> ${String(p.code || '')}`;
+      meta.appendChild(skuLine);
+
+      const variantBits = [];
+      if(p.color) variantBits.push(p.color);
+      if(p.size) variantBits.push(p.size);
+      if(variantBits.length){
+        const variant = document.createElement('div');
+        variant.innerHTML = `<b>Variant:</b> ${variantBits.join(' / ')}`;
+        meta.appendChild(variant);
+      }
+
+      const qtyBits = [];
+      if(Number.isFinite(miniCart.quantityAdded)) qtyBits.push(`Added: ${miniCart.quantityAdded}`);
+      if(Number.isFinite(miniCart.quantityInCart)) qtyBits.push(`In bag: ${miniCart.quantityInCart}`);
+      if(qtyBits.length){
+        const qtyLine = document.createElement('div');
+        qtyLine.innerHTML = `<b>Qty:</b> ${qtyBits.join(' • ')}`;
+        meta.appendChild(qtyLine);
+      }
+
+      const priceBits = [];
+      if(base.formattedValue) priceBits.push(`Each: ${base.formattedValue}`);
+      if(total.formattedValue) priceBits.push(`Line: ${total.formattedValue}`);
+      if(priceBits.length){
+        const priceLine = document.createElement('div');
+        priceLine.innerHTML = `<b>Price:</b> ${priceBits.join(' • ')}`;
+        meta.appendChild(priceLine);
+      }
+
+      content.appendChild(title);
+      content.appendChild(meta);
+
+      const actions = document.createElement('div');
+      actions.className = 'tile-actions';
+
+      const bagBtn = document.createElement('a');
+      bagBtn.className = 'primary';
+      bagBtn.innerText = 'Open bag';
+      bagBtn.href = miniCart.bagUrl || '/';
+      bagBtn.target = '_blank';
+      bagBtn.rel = 'noopener';
+      actions.appendChild(bagBtn);
+
+      if(p.url){
+        const viewBtn = document.createElement('a');
+        viewBtn.className = 'secondary';
+        viewBtn.innerText = 'View item';
+        viewBtn.href = p.url;
+        viewBtn.target = '_blank';
+        viewBtn.rel = 'noopener';
+        actions.appendChild(viewBtn);
+      }
+
+      tile.appendChild(media);
+      tile.appendChild(content);
+      tile.appendChild(actions);
+      grid.appendChild(tile);
+
+      container.appendChild(grid);
+      chatBody.appendChild(container);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    function appendCartSummary(summary){
+      const s = summary && typeof summary === 'object' ? summary : null;
+      if(!s) return;
+
+      const container = document.createElement('div');
+      container.className = 'message agent light';
+
+      const grid = document.createElement('div');
+      grid.className = 'tiles';
+
+      const tile = document.createElement('div');
+      tile.className = 'tile tile-summary';
+
+      const media = document.createElement('div');
+      media.className = 'tile-media';
+      // Keep blank media cell for consistent layout.
+
+      const content = document.createElement('div');
+      content.className = 'tile-content';
+
+      const title = document.createElement('h4');
+      title.innerText = 'Bag summary';
+
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+
+      const guid = String(s.cartGuid || '').trim();
+      if(guid){
+        const guidLine = document.createElement('div');
+        guidLine.innerHTML = `<b>Cart:</b> ${guid}`;
+        meta.appendChild(guidLine);
+      }
+
+      const cartId = String(s.cartId || '').trim();
+      if(cartId){
+        const idLine = document.createElement('div');
+        idLine.innerHTML = `<b>Cart ID:</b> ${cartId}`;
+        meta.appendChild(idLine);
+      }
+
+      const currency = String(s.currency || '').trim();
+      if(currency){
+        const curLine = document.createElement('div');
+        curLine.innerHTML = `<b>Currency:</b> ${currency}`;
+        meta.appendChild(curLine);
+      }
+
+      const total = (s.totalPrice && typeof s.totalPrice === 'object') ? s.totalPrice : {};
+      if(total.formattedValue){
+        const totalLine = document.createElement('div');
+        totalLine.innerHTML = `<b>Total:</b> ${String(total.formattedValue)}`;
+        meta.appendChild(totalLine);
+      }
+
+      const subtotal = (s.subtotal && typeof s.subtotal === 'object') ? s.subtotal : {};
+      if(subtotal.formattedValue){
+        const subLine = document.createElement('div');
+        subLine.innerHTML = `<b>Subtotal:</b> ${String(subtotal.formattedValue)}`;
+        meta.appendChild(subLine);
+      }
+
+      const tax = (s.tax && typeof s.tax === 'object') ? s.tax : {};
+      if(tax.formattedValue){
+        const taxLine = document.createElement('div');
+        taxLine.innerHTML = `<b>Tax:</b> ${String(tax.formattedValue)}`;
+        meta.appendChild(taxLine);
+      }
+
+      const items = Array.isArray(s.items) ? s.items : [];
+      if(items.length){
+        const itemsTitle = document.createElement('div');
+        itemsTitle.innerHTML = `<b>Items:</b>`;
+        meta.appendChild(itemsTitle);
+
+        items.slice(0, 8).forEach(it => {
+          const code = String(it?.code || '').trim();
+          const baseCode = String(it?.baseCode || '').trim();
+          const name = String(it?.name || '').trim();
+          const qty = Number.isFinite(Number(it?.quantity)) ? Number(it.quantity) : null;
+          const lineTotal = String(it?.lineTotal?.formattedValue || '').trim();
+          const unit = String(it?.unitPrice?.formattedValue || '').trim();
+          const size = String(it?.size || '').trim();
+          const color = String(it?.color || '').trim();
+          const parts = [];
+          if(name) parts.push(name);
+          if(code) parts.push(code);
+          if(!code && baseCode) parts.push(baseCode);
+          if(color || size) parts.push([color,size].filter(Boolean).join(' / '));
+          if(qty !== null) parts.push(`x${qty}`);
+          if(unit) parts.push(unit);
+          if(lineTotal) parts.push(lineTotal);
+          const row = document.createElement('div');
+          row.innerText = parts.join(' • ');
+          meta.appendChild(row);
+        });
+
+        if(items.length > 8){
+          const more = document.createElement('div');
+          more.innerText = `+${items.length - 8} more item(s)`;
+          meta.appendChild(more);
+        }
+      }
+
+      content.appendChild(title);
+      content.appendChild(meta);
+
+      const actions = document.createElement('div');
+      actions.className = 'tile-actions';
+
+      const refreshBtn = document.createElement('button');
+      refreshBtn.type = 'button';
+      refreshBtn.className = 'secondary';
+      refreshBtn.innerText = 'Refresh';
+      refreshBtn.addEventListener('click', async ()=>{
+        refreshBtn.disabled = true;
+        const thinking = appendThinking('Refreshing bag');
+        try{
+          const res = await fetch('/cart/twc/summary');
+          const data = await res.json().catch(()=> ({}));
+          thinking.remove();
+          refreshBtn.disabled = false;
+          if(res.ok && data?.ok && data?.cartSummary){
+            container.remove();
+            appendCartSummary(data.cartSummary);
+          } else {
+            appendMessage(`Bag refresh failed${res.status ? ` (${res.status})` : ''}: ${data?.error || res.statusText}`, 'agent');
+          }
+        }catch(err){
+          thinking.remove();
+          refreshBtn.disabled = false;
+          appendMessage('Bag refresh error: ' + (err?.message || String(err)), 'agent');
+        }
+      });
+      actions.appendChild(refreshBtn);
+
+      tile.appendChild(media);
+      tile.appendChild(content);
+      tile.appendChild(actions);
+      grid.appendChild(tile);
+      container.appendChild(grid);
+      chatBody.appendChild(container);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    function appendVariantPicker(picker){
+      if(!picker || typeof picker !== 'object') return;
+      const swatches = Array.isArray(picker.swatches) ? picker.swatches : [];
+      if(!swatches.length) return;
+
+      const container = document.createElement('div');
+      container.className = 'message agent light';
+
+      const wrap = document.createElement('div');
+      wrap.className = 'refine';
+
+      const title = document.createElement('div');
+      title.style.fontWeight = '800';
+      title.style.fontSize = '12px';
+      title.innerText = picker.name ? `Choose options — ${picker.name}` : 'Choose options';
+      wrap.appendChild(title);
+
+      const state = {
+        swatchIndex: 0,
+        size: null
+      };
+
+      const colourRow = document.createElement('div');
+      colourRow.className = 'refine-row';
+
+      const sizeRow = document.createElement('div');
+      sizeRow.className = 'refine-row';
+
+      const actions = document.createElement('div');
+      actions.className = 'refine-actions';
+
+      const cancelBtn = document.createElement('button');
+      cancelBtn.type = 'button';
+      cancelBtn.innerText = 'Cancel';
+      cancelBtn.addEventListener('click', ()=>{
+        container.remove();
+        appendMessage('No problem — tell me a different colour/size, or search again.', 'agent');
+      });
+
+      const addBtn = document.createElement('button');
+      addBtn.type = 'button';
+      addBtn.className = 'primary';
+      addBtn.innerText = 'Add to bag';
+      addBtn.disabled = true;
+
+      const makeChip = (label, onToggle) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'chip';
+        btn.setAttribute('aria-pressed','false');
+        btn.innerText = label;
+        btn.addEventListener('click', ()=> onToggle(btn));
+        return btn;
+      };
+
+      const updateAddEnabled = ()=>{
+        addBtn.disabled = !(state.size && Number.isFinite(state.swatchIndex));
+      };
+
+      const renderSizes = ()=>{
+        sizeRow.innerHTML = '';
+        const sw = swatches[state.swatchIndex] || swatches[0];
+        const variants = Array.isArray(sw?.variants) ? sw.variants : [];
+        const bySize = new Map();
+        for(const v of variants){
+          if(!v || !v.size || !v.code) continue;
+          if(!bySize.has(v.size)) bySize.set(v.size, v);
+        }
+        const sizes = Array.from(bySize.keys()).sort((a,b)=>{
+          const na = Number(a); const nb = Number(b);
+          if(Number.isFinite(na) && Number.isFinite(nb)) return na-nb;
+          return String(a).localeCompare(String(b));
+        });
+        let selectedEl = null;
+        sizes.forEach(sz => {
+          const v = bySize.get(sz);
+          const label = v?.inStock === false ? `${sz} (OOS)` : sz;
+          const chip = makeChip(label, (btn)=>{
+            if(selectedEl) selectedEl.setAttribute('aria-pressed','false');
+            selectedEl = btn;
+            btn.setAttribute('aria-pressed','true');
+            state.size = sz;
+            updateAddEnabled();
+          });
+          if(v?.inStock === false) chip.style.opacity = '0.6';
+          sizeRow.appendChild(chip);
+        });
+        state.size = null;
+        updateAddEnabled();
+      };
+
+      // Colours
+      let selectedColourEl = null;
+      swatches.slice(0, 10).forEach((sw, idx)=>{
+        const chip = makeChip(sw?.name || `Option ${idx+1}`, (btn)=>{
+          if(selectedColourEl) selectedColourEl.setAttribute('aria-pressed','false');
+          selectedColourEl = btn;
+          btn.setAttribute('aria-pressed','true');
+          state.swatchIndex = idx;
+          renderSizes();
+        });
+        colourRow.appendChild(chip);
+        if(idx === 0){
+          selectedColourEl = chip;
+          chip.setAttribute('aria-pressed','true');
+        }
+      });
+
+      renderSizes();
+
+      addBtn.addEventListener('click', async ()=>{
+        const sw = swatches[state.swatchIndex] || swatches[0];
+        const variants = Array.isArray(sw?.variants) ? sw.variants : [];
+        const selectedVariant = variants.find(v => v && String(v.size) === String(state.size) && v.code) || null;
+        if(!selectedVariant || !selectedVariant.code){
+          appendMessage('Please pick a size to continue.', 'agent');
+          return;
+        }
+
+        addBtn.disabled = true;
+        const thinking = appendThinking('Adding to cart');
+        try{
+          const res = await fetch('/cart/twc/add',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({ sku: selectedVariant.code, qty: picker.qty || 1, referer: String(sw?.url || '').trim() })
+          });
+          const data = await res.json().catch(()=> ({}));
+          thinking.remove();
+          if(res.ok && data && data.ok && data.miniCart){
+            container.remove();
+            appendMessage('Added to bag.', 'agent');
+            appendMiniCart(data.miniCart);
+            if(data.cartSummary) appendCartSummary(data.cartSummary);
+          } else {
+            appendMessage(`Live add-to-bag failed${res.status ? ` (${res.status})` : ''}: ${data?.error || res.statusText}`, 'agent');
+            addBtn.disabled = false;
+          }
+        }catch(err){
+          thinking.remove();
+          appendMessage('Add to cart error: ' + (err?.message || String(err)), 'agent');
+          addBtn.disabled = false;
+        }
+      });
+
+      actions.appendChild(cancelBtn);
+      actions.appendChild(addBtn);
+
+      wrap.appendChild(colourRow);
+      wrap.appendChild(sizeRow);
+      wrap.appendChild(actions);
+
+      container.appendChild(wrap);
+      chatBody.appendChild(container);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    async function tryLiveTwcAddToCart(product, qty = 1){
+      const p = product && typeof product === 'object' ? product : {};
+      const sku = String(p.code || '').trim();
+      if(!sku) return { ok:false, reason:'missing_sku' };
+      try{
+        const res = await fetch('/cart/twc/add',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({ sku, qty, referer: String(p.url || '').trim() })
+        });
+        const data = await res.json().catch(()=> ({}));
+        if(res.ok && data && data.ok && data.miniCart){
+          return { ok:true, miniCart: data.miniCart, cartSummary: data.cartSummary || null };
+        }
+        // If endpoint is disabled (501), allow fallback to demo cart.
+        if(res.status === 501){
+          return { ok:false, reason:'disabled', status: res.status, error: data?.error || res.statusText };
+        }
+        // If enabled but failing, do NOT silently fall back.
+        return { ok:false, reason:'failed', status: res.status, error: data?.error || res.statusText, details: data?.details || null };
+      }catch(err){
+        return { ok:false, reason:'network', error: err?.message || String(err) };
+      }
+    }
+
+    function isLikelyTwcBaseCode(value){
+      const v = String(value || '').trim();
+      return /^[A-Za-z]\d{4,6}$/.test(v) || /^\d{4,6}$/.test(v);
+    }
+
+    async function requestVariantPicker(baseCode){
+      const code = String(baseCode || '').trim();
+      if(!code) return;
+      const thinking = appendThinking('Loading variants');
+      try{
+        const res = await fetch('/chat',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({ message: `add ${code}` })
+        });
+        const data = await res.json().catch(()=> ({}));
+        thinking.remove();
+        if(data?.reply) appendMessage(String(data.reply), 'agent');
+        if(data?.variantPicker) appendVariantPicker(data.variantPicker);
+        if(data?.miniCart) appendMiniCart(data.miniCart);
+        return data;
+      }catch(err){
+        thinking.remove();
+        appendMessage('Variant lookup failed: ' + (err?.message || String(err)), 'agent');
+        return null;
+      }
+    }
+
+    function appendProductSummaryTile(p){
+      if(!p || typeof p !== 'object') return;
+
+      const container = document.createElement('div');
+      container.className = 'message agent light';
+
+      const grid = document.createElement('div');
+      grid.className = 'tiles';
+
+      const tile = document.createElement('div');
+      tile.className = 'tile tile-summary';
+
+      const media = document.createElement('div');
+      media.className = 'tile-media';
+      if (p.image) {
+        const img = document.createElement('img');
+        img.loading = 'lazy';
+        img.alt = p.name || 'Product image';
+        img.src = p.image;
+        media.appendChild(img);
+      }
+
+      const content = document.createElement('div');
+      content.className = 'tile-content';
+
+      const title = document.createElement('h4');
+      title.innerText = p.name || 'Product summary';
+
+      const ratingLine = document.createElement('div');
+      ratingLine.className = 'rating-line';
+      const rating = (typeof p.averageRating === 'number' && Number.isFinite(p.averageRating)) ? p.averageRating : null;
+      const ratingCount = (typeof p.ratingCount === 'number' && Number.isFinite(p.ratingCount)) ? p.ratingCount : null;
+
+      const makeStars = (value)=>{
+        if(typeof value !== 'number' || !Number.isFinite(value)) return '';
+        const clamped = Math.max(0, Math.min(5, value));
+        const full = Math.round(clamped);
+        return '★★★★★'.slice(0, full) + '☆☆☆☆☆'.slice(0, 5-full);
+      };
+
+      if(rating !== null){
+        const stars = document.createElement('span');
+        stars.className = 'stars';
+        stars.innerText = makeStars(rating);
+
+        const numeric = document.createElement('span');
+        const rText = rating.toFixed(1).replace(/\.0$/, '');
+        numeric.innerText = ratingCount !== null ? `${rText}/5 (${ratingCount})` : `${rText}/5`;
+
+        ratingLine.appendChild(stars);
+        ratingLine.appendChild(numeric);
+      } else {
+        const none = document.createElement('span');
+        none.innerText = 'Rating: —';
+        ratingLine.appendChild(none);
+      }
+
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      const skuLine = document.createElement('div');
+      skuLine.innerHTML = `<b>SKU:</b> ${String(p.code || '')}`;
+      const priceLine = document.createElement('div');
+      priceLine.innerHTML = `<b>Price:</b> ${p.price ? String(p.price) : '—'}`;
+      meta.appendChild(skuLine);
+      meta.appendChild(priceLine);
+
+      const summary = document.createElement('div');
+      summary.className = 'summary';
+      summary.innerText = String(p.summary || '').trim();
+
+      content.appendChild(title);
+      content.appendChild(ratingLine);
+      content.appendChild(meta);
+      if(summary.innerText) content.appendChild(summary);
+
+      const actions = document.createElement('div');
+      actions.className = 'tile-actions';
+      const viewBtn = document.createElement('a');
+      viewBtn.className = 'secondary';
+      viewBtn.innerText = 'View details';
+      viewBtn.href = p.url || '#';
+      viewBtn.target = '_blank';
+      viewBtn.rel = 'noopener';
+      viewBtn.addEventListener('click', (e)=>{ if(!p.url){ e.preventDefault(); } });
+
+      const addBtn = document.createElement('button');
+      addBtn.type = 'button';
+      addBtn.className = 'primary';
+      addBtn.innerText = 'Add to cart';
+      addBtn.addEventListener('click', async ()=>{
+        addBtn.disabled = true;
+        const original = addBtn.innerText;
+        addBtn.innerText = 'Adding…';
+        const thinking = appendThinking('Adding to cart');
+        try{
+          const payload = {
+            code: String(p.code || '').trim(),
+            name: String(p.name || '').trim(),
+            price: String(p.price || '').trim(),
+            currency: String(p.currency || '').trim(),
+            url: String(p.url || '').trim(),
+            image: String(p.image || '').trim(),
+          };
+
+          if(isLikelyTwcBaseCode(payload.code)){
+            thinking.remove();
+            await requestVariantPicker(payload.code);
+            return;
+          }
+
+          const live = await tryLiveTwcAddToCart(payload, 1);
+          thinking.remove();
+          if(live.ok && live.miniCart){
+            appendMessage('Added to bag.', 'agent');
+            appendMiniCart(live.miniCart);
+            if(live.cartSummary) appendCartSummary(live.cartSummary);
+            return;
+          }
+
+          if(live.reason === 'failed'){
+            appendMessage(`Live add-to-bag failed${live.status ? ` (${live.status})` : ''}: ${live.error || 'unknown error'}`, 'agent');
+            return;
+          }
+
+          const res = await fetch('/cart/local/add',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({ product: payload })
+          });
+          const data = await res.json().catch(()=> ({}));
+          if(res.ok && data.ok){
+            appendMessage(`Added ${payload.code || 'item'} to your demo cart (dummy step).`, 'agent');
+          } else {
+            appendMessage(`Add to cart failed: ${data.error || res.statusText}`, 'agent');
+          }
+        }catch(err){
+          thinking.remove();
+          appendMessage('Add to cart error: ' + err.message, 'agent');
+        }finally{
+          addBtn.disabled = false;
+          addBtn.innerText = original;
+        }
+      });
+
+      actions.appendChild(viewBtn);
+      actions.appendChild(addBtn);
+
+      tile.appendChild(media);
+      tile.appendChild(content);
+      tile.appendChild(actions);
+
+      grid.appendChild(tile);
+      container.appendChild(grid);
+      chatBody.appendChild(container);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    function appendProductTiles(products, opts = {}){
+      if(!Array.isArray(products) || products.length === 0) return;
+
+      const container = document.createElement('div');
+      container.className = 'message agent light';
+      const grid = document.createElement('div');
+      grid.className = 'tiles';
+
+      const state = {
+        products,
+        shown: 0
+      };
+
+      const titleText = opts.title || 'Results';
+      const head = document.createElement('div');
+      head.className = 'results-head';
+      const headLeft = document.createElement('strong');
+      headLeft.innerText = titleText;
+      const headRight = document.createElement('span');
+      headRight.innerText = `${products.length} result${products.length === 1 ? '' : 's'} found`;
+      head.appendChild(headLeft);
+      head.appendChild(headRight);
+      container.appendChild(head);
+
+      const makeTile = (p)=>{
+        const tile = document.createElement('div');
+        tile.className = 'tile tile-summary';
+
+        const media = document.createElement('div');
+        media.className = 'tile-media';
+        if (p.image) {
+          const img = document.createElement('img');
+          img.loading = 'lazy';
+          img.alt = p.name || 'Product image';
+          img.src = p.image;
+          media.appendChild(img);
+        }
+
+        const content = document.createElement('div');
+        content.className = 'tile-content';
+
+        const title = document.createElement('h4');
+        title.innerText = p.name || 'Product';
+
+        const ratingLine = document.createElement('div');
+        ratingLine.className = 'rating-line';
+        const rating = (typeof p.averageRating === 'number' && Number.isFinite(p.averageRating)) ? p.averageRating : null;
+        const makeStars = (value)=>{
+          if(typeof value !== 'number' || !Number.isFinite(value)) return '';
+          const clamped = Math.max(0, Math.min(5, value));
+          const full = Math.round(clamped);
+          return '★★★★★'.slice(0, full) + '☆☆☆☆☆'.slice(0, 5-full);
+        };
+        if(rating !== null){
+          const stars = document.createElement('span');
+          stars.className = 'stars';
+          stars.innerText = makeStars(rating);
+
+          const numeric = document.createElement('span');
+          const rText = rating.toFixed(1).replace(/\.0$/, '');
+          numeric.innerText = `${rText}/5`;
+
+          ratingLine.appendChild(stars);
+          ratingLine.appendChild(numeric);
+        } else {
+          const none = document.createElement('span');
+          none.innerText = 'Rating: —';
+          ratingLine.appendChild(none);
+        }
+
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+
+        const skuLine = document.createElement('div');
+        skuLine.innerHTML = `<b>SKU:</b> ${String(p.code || '')}`;
+
+        const priceLine = document.createElement('div');
+        priceLine.innerHTML = `<b>Price:</b> ${p.price ? String(p.price) : '—'}`;
+
+        meta.appendChild(skuLine);
+        meta.appendChild(priceLine);
+
+        const actions = document.createElement('div');
+        actions.className = 'tile-actions';
+
+        const viewBtn = document.createElement('a');
+        viewBtn.className = 'secondary';
+        viewBtn.innerText = 'View details';
+        viewBtn.href = p.url || '#';
+        viewBtn.target = '_blank';
+        viewBtn.rel = 'noopener';
+        viewBtn.addEventListener('click', (e)=>{
+          if(!p.url){ e.preventDefault(); return; }
+        });
+
+        const addBtn = document.createElement('button');
+        addBtn.type = 'button';
+        addBtn.className = 'primary';
+        addBtn.innerText = 'Add to cart';
+        addBtn.addEventListener('click', async ()=>{
+          addBtn.disabled = true;
+          const original = addBtn.innerText;
+          addBtn.innerText = 'Adding…';
+          const thinking = appendThinking('Adding to cart');
+          try{
+            thinking.remove();
+
+            if(isLikelyTwcBaseCode(p?.code || '')){
+              await requestVariantPicker(p.code);
+              return;
+            }
+
+            const live = await tryLiveTwcAddToCart(p, 1);
+            if(live.ok && live.miniCart){
+              appendMessage('Added to bag.', 'agent');
+              appendMiniCart(live.miniCart);
+              return;
+            }
+
+            if(live.reason === 'failed'){
+              appendMessage(`Live add-to-bag failed${live.status ? ` (${live.status})` : ''}: ${live.error || 'unknown error'}`, 'agent');
+              return;
+            }
+
+            const res = await fetch('/cart/local/add',{
+              method:'POST',
+              headers:{'Content-Type':'application/json'},
+              body:JSON.stringify({ product: p })
+            });
+            const data = await res.json().catch(()=> ({}));
+            if(res.ok && data.ok){
+              appendMessage(`Added ${p.code} to your demo cart (dummy step).`, 'agent');
+            } else {
+              appendMessage(`Add to cart failed: ${data.error || res.statusText}`, 'agent');
+            }
+          }catch(err){
+            thinking.remove();
+            appendMessage('Add to cart error: ' + err.message, 'agent');
+          }finally{
+            addBtn.disabled = false;
+            addBtn.innerText = original;
+          }
+        });
+
+        actions.appendChild(viewBtn);
+        actions.appendChild(addBtn);
+
+        const summary = document.createElement('div');
+        summary.className = 'summary';
+        summary.innerText = String(p.summary || '').trim();
+
+        content.appendChild(title);
+        content.appendChild(ratingLine);
+        content.appendChild(meta);
+        if(summary.innerText) content.appendChild(summary);
+
+        tile.appendChild(media);
+        tile.appendChild(content);
+        tile.appendChild(actions);
+        return tile;
+      };
+
+      const viewMoreRow = document.createElement('div');
+      viewMoreRow.className = 'refine-actions';
+      viewMoreRow.style.marginTop = '10px';
+
+      const viewMoreBtn = document.createElement('button');
+      viewMoreBtn.type = 'button';
+      viewMoreBtn.className = 'secondary';
+      viewMoreBtn.innerText = 'View more';
+
+      const foot = document.createElement('div');
+      foot.className = 'results-foot';
+      const shownLine = document.createElement('div');
+      const nextLine = document.createElement('div');
+      nextLine.innerText = 'Next actions: click “View details”, say “product summary for <SKU>”, say “show product details for <SKU>” (opens page), or say “show more”. Checkout is a demo summary only.';
+      foot.appendChild(shownLine);
+      foot.appendChild(nextLine);
+
+      const updateShownLine = ()=>{
+        shownLine.innerText = `Showing ${Math.min(state.shown, products.length)} of ${products.length}. Use “View more” to reveal more from the last search.`;
+      };
+
+      const renderNext = ()=>{
+        const next = state.products.slice(state.shown, state.shown + 3);
+        next.forEach(p => grid.appendChild(makeTile(p)));
+        state.shown += next.length;
+        viewMoreBtn.style.display = state.shown < state.products.length ? 'inline-flex' : 'none';
+        updateShownLine();
+        chatBody.scrollTop = chatBody.scrollHeight;
+      };
+
+      viewMoreBtn.addEventListener('click', ()=>{
+        renderNext();
+      });
+
+      renderNext();
+
+      container.appendChild(grid);
+      viewMoreRow.appendChild(viewMoreBtn);
+      container.appendChild(viewMoreRow);
+      container.appendChild(foot);
+
+      chatBody.appendChild(container);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    function appendRefineControls(facets, search){
+      if(!Array.isArray(facets) || facets.length === 0) return;
+      if(!search || !search.text) return;
+
+      const sizeFacet = facets.find(f => f && f.code === 'v_facet_size-sm');
+      const colourFacet = facets.find(f => f && f.code === 'v_facet_colour-sm');
+      if(!sizeFacet && !colourFacet) return;
+
+      const container = document.createElement('div');
+      container.className = 'message agent light';
+
+      const wrap = document.createElement('div');
+      wrap.className = 'refine';
+
+      const title = document.createElement('div');
+      title.style.fontWeight = '800';
+      title.style.fontSize = '12px';
+      title.innerText = 'Filters (multi-select)';
+      wrap.appendChild(title);
+
+      const selected = {
+        sizeCodes: new Set(),
+        colourCodes: new Set(),
+        minPrice: null,
+        maxPrice: null
+      };
+
+      const makeChip = (label, onToggle) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'chip';
+        btn.setAttribute('aria-pressed','false');
+        btn.innerText = label;
+        btn.addEventListener('click', ()=>{
+          const pressed = btn.getAttribute('aria-pressed') === 'true';
+          btn.setAttribute('aria-pressed', pressed ? 'false' : 'true');
+          onToggle(!pressed);
+        });
+        return btn;
+      };
+
+      if(sizeFacet && Array.isArray(sizeFacet.values) && sizeFacet.values.length){
+        const row = document.createElement('div');
+        row.className = 'refine-row';
+        sizeFacet.values.slice(0, 10).forEach(v => {
+          row.appendChild(makeChip(v.name, (on)=>{
+            if(on) selected.sizeCodes.add(v.code);
+            else selected.sizeCodes.delete(v.code);
+          }));
+        });
+        wrap.appendChild(row);
+      }
+
+      if(colourFacet && Array.isArray(colourFacet.values) && colourFacet.values.length){
+        const row = document.createElement('div');
+        row.className = 'refine-row';
+        colourFacet.values.slice(0, 10).forEach(v => {
+          row.appendChild(makeChip(v.name, (on)=>{
+            if(on) selected.colourCodes.add(v.code);
+            else selected.colourCodes.delete(v.code);
+          }));
+        });
+        wrap.appendChild(row);
+      }
+
+      // Quick price blocks
+      const priceRow = document.createElement('div');
+      priceRow.className = 'refine-row';
+      let activePriceKey = null;
+      const priceChips = [];
+      const setActivePrice = (key, min, max) => {
+        activePriceKey = key;
+        selected.minPrice = min;
+        selected.maxPrice = max;
+        for (const c of priceChips) {
+          c.el.setAttribute('aria-pressed', c.key === activePriceKey ? 'true' : 'false');
+        }
+      };
+      const addPriceChip = (key, label, min, max) => {
+        const el = document.createElement('button');
+        el.type = 'button';
+        el.className = 'chip';
+        el.setAttribute('aria-pressed','false');
+        el.innerText = label;
+        el.addEventListener('click', ()=>{
+          const isActive = activePriceKey === key;
+          if (isActive) {
+            setActivePrice(null, null, null);
+          } else {
+            setActivePrice(key, min, max);
+          }
+        });
+        priceChips.push({ key, el });
+        return el;
+      };
+
+      priceRow.appendChild(addPriceChip('under50', 'Under £50', null, 50));
+      priceRow.appendChild(addPriceChip('50to100', '£50–£100', 50, 100));
+      priceRow.appendChild(addPriceChip('100to150', '£100–£150', 100, 150));
+      wrap.appendChild(priceRow);
+
+      const actions = document.createElement('div');
+      actions.className = 'refine-actions';
+
+      const clearBtn = document.createElement('button');
+      clearBtn.type = 'button';
+      clearBtn.innerText = 'Clear';
+      clearBtn.addEventListener('click', ()=>{
+        container.remove();
+        appendMessage('Refinement cleared. Ask for another filter, or search again.', 'agent');
+      });
+
+      const applyBtn = document.createElement('button');
+      applyBtn.type = 'button';
+      applyBtn.className = 'primary';
+      applyBtn.innerText = 'Apply filters';
+      applyBtn.addEventListener('click', async ()=>{
+        const thinking = appendThinking('Refining search');
+        try{
+          const hasNumber = (v) => (typeof v === 'number' && Number.isFinite(v));
+          const filters = {
+            sizeCodes: Array.from(selected.sizeCodes),
+            colourCodes: Array.from(selected.colourCodes),
+            ...(hasNumber(selected.minPrice) ? { minPrice: selected.minPrice } : {}),
+            ...(hasNumber(selected.maxPrice) ? { maxPrice: selected.maxPrice } : {})
+          };
+          const res = await fetch('/chat', {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ message: 'refine', search: { text: search.text, filters } })
+          });
+          const data = await res.json().catch(()=> ({}));
+          thinking.remove();
+          if(res.ok){
+            if(data.reply) appendMessage(data.reply, 'agent');
+            const count = Array.isArray(data.products) ? data.products.length : 0;
+            appendMessage(`Refine returned ${count} product(s).`, 'agent');
+            if(count > 0) {
+              try {
+                appendProductTiles(data.products, { title: 'Refined results' });
+              } catch (e) {
+                appendMessage('Render error: ' + (e?.message || String(e)), 'agent');
+              }
+            } else {
+              appendMessage('No products matched those filters. Try removing one filter.', 'agent');
+            }
+            if(SHOW_REFINE_CONTROLS && Array.isArray(data.facets) && data.facets.length && data.search) appendRefineControls(data.facets, data.search);
+          } else {
+            appendMessage(data.reply || 'Refine failed.', 'agent');
+          }
+        }catch(err){
+          thinking.remove();
+          appendMessage('Refine error: ' + err.message, 'agent');
+        }
+      });
+
+      actions.appendChild(clearBtn);
+      actions.appendChild(applyBtn);
+      wrap.appendChild(actions);
+
+      container.appendChild(wrap);
+      chatBody.appendChild(container);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    // Voice input (speech-to-text) using the browser Web Speech API.
+    (function enableVoiceInput(){
+      if(!micBtn) return;
+
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if(!SpeechRecognition){
+        micBtn.disabled = true;
+        micBtn.title = 'Voice input not supported in this browser';
+        micBtn.setAttribute('aria-label','Voice input not supported');
+        return;
+      }
+
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      let listening = false;
+      function setListening(next){
+        listening = next;
+        micBtn.setAttribute('aria-pressed', String(listening));
+        micBtn.title = listening ? 'Listening… click to stop' : 'Voice input';
+      }
+
+      micBtn.addEventListener('click', ()=>{
+        try{
+          if(listening){
+            recognition.stop();
+            setListening(false);
+            return;
+          }
+          recognition.lang = navigator.language || 'en-US';
+          setListening(true);
+          recognition.start();
+        }catch(e){
+          setListening(false);
+        }
+      });
+
+      recognition.addEventListener('result', (event)=>{
+        const transcript = event.results?.[0]?.[0]?.transcript;
+        if(transcript){
+          widgetInput.value = transcript.trim();
+          // Auto-send so the user doesn't need to type.
+          widgetForm.requestSubmit();
+        }
+      });
+
+      recognition.addEventListener('error', (event)=>{
+        appendMessage('Voice input error: ' + (event.error || 'unknown'), 'agent');
+      });
+
+      recognition.addEventListener('end', ()=>{
+        setListening(false);
+      });
+    })();
+
+    widgetForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const text = widgetInput.value.trim();
+      if(!text) return;
+
+      appendMessage(text,'user');
+      widgetInput.value='';
+
+      const thinking = appendThinking('Working');
+      try{
+        const res = await fetch('/chat',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({ message: text })
+        });
+        const data = await res.json();
+        thinking.remove();
+        if(data && data.reply) appendMessage(data.reply,'agent');
+        if(data && data.action && data.action.type === 'open_url' && data.action.url){
+          window.open(data.action.url, '_blank', 'noopener');
+        }
+        if(data && data.productSummary){
+          try{
+            appendProductSummaryTile(data.productSummary);
+          }catch(e){
+            appendMessage('Render error: ' + (e?.message || String(e)), 'agent');
+          }
+        }
+        if(data && data.miniCart){
+          try{
+            appendMiniCart(data.miniCart);
+          }catch(e){
+            appendMessage('Mini cart render error: ' + (e?.message || String(e)), 'agent');
+          }
+        }
+        if(data && data.variantPicker){
+          try{
+            appendVariantPicker(data.variantPicker);
+          }catch(e){
+            appendMessage('Variant picker render error: ' + (e?.message || String(e)), 'agent');
+          }
+        }
+        appendProductTiles(data.products, { title: 'Top results' });
+        if(SHOW_REFINE_CONTROLS && Array.isArray(data.facets) && data.facets.length && data.search){
+          appendRefineControls(data.facets, data.search);
+        }
+      }catch(err){
+        thinking.remove();
+        appendMessage('Error contacting server: '+err.message,'agent');
+      }
+    });
+
+    // Allow pressing Escape to minimize
+    window.addEventListener('keydown',(e)=>{ if(e.key==='Escape'){ minimized=true; hidePanel(); } });
+  </script>
+</body>
+</html>

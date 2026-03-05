@@ -1,0 +1,38 @@
+[
+  {
+    "name": "view_details_no_context_sentence",
+    "status": 200,
+    "reply": "Which product do you want to view details for? Please provide a SKU (e.g. “show product details for A15239”) or search first.",
+    "actionUrl": null,
+    "productSummaryCode": null,
+    "productsCount": null,
+    "firstProductSummary": null
+  },
+  {
+    "name": "details_15239_sentence",
+    "status": 200,
+    "reply": "Opening the product page for “A15239”.",
+    "actionUrl": "https://www.thewhitecompany.com/The-Perfect-Organic-Cotton-Rib-Side-Shirt/p/A15239?swatch=Navy",
+    "productSummaryCode": null,
+    "productsCount": null,
+    "firstProductSummary": null
+  },
+  {
+    "name": "summary_15239",
+    "status": 200,
+    "reply": "Here’s a quick summary of “The Perfect Organic Cotton Rib Side Shirt”.",
+    "actionUrl": null,
+    "productSummaryCode": "A15239",
+    "productsCount": null,
+    "firstProductSummary": null
+  },
+  {
+    "name": "search_blue_event_shirt",
+    "status": 200,
+    "reply": "Here are the top results for “blue event shirt”.",
+    "actionUrl": null,
+    "productSummaryCode": null,
+    "productsCount": 48,
+    "firstProductSummary": "Linen Tapered Brompton Trousers - Navy — £110.00."
+  }
+]

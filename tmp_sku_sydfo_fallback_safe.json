@@ -1,0 +1,24 @@
+[
+  {
+    "step": "search_scent",
+    "cookie": "twc_ai_demo_sid=85e57fcc-e8da-4961-9f40-583b0348721b",
+    "status": 200,
+    "reply": "Here are the top results for “scent”.",
+    "action": null,
+    "hasProductSummary": false,
+    "productSummaryCode": null,
+    "productsCount": 23,
+    "firstProductCode": "A12468"
+  },
+  {
+    "step": "show_more_details_sku_spaced",
+    "cookie": "twc_ai_demo_sid=85e57fcc-e8da-4961-9f40-583b0348721b",
+    "status": 200,
+    "reply": "Here’s what I found for “Seychelles Fragrance Oil”.",
+    "action": null,
+    "hasProductSummary": true,
+    "productSummaryCode": "SYDFO",
+    "productsCount": null,
+    "firstProductCode": null
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "step": "search_scent",
+    "cookie": "twc_ai_demo_sid=0771ccf0-f320-40e3-9e68-d72697ec8f20",
+    "status": 200,
+    "reply": "Here are the top results for “scent”.",
+    "action": null,
+    "hasProductSummary": false,
+    "productSummaryCode": null,
+    "productsCount": 23
+  },
+  {
+    "step": "show_more_details_sku_spaced",
+    "cookie": "twc_ai_demo_sid=0771ccf0-f320-40e3-9e68-d72697ec8f20",
+    "status": 200,
+    "reply": "I couldn't find products for “show more details for SKU s y dfo”. Try a different keyword.",
+    "action": null,
+    "hasProductSummary": false,
+    "productSummaryCode": null,
+    "productsCount": 0
+  }
+]

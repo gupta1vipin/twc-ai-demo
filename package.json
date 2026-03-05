@@ -1,0 +1,21 @@
+{
+  "name": "twc-ai-demo",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "nodemon --watch . --ext js,mjs,json,html,css --exec node server.mjs"
+  },
+  "dependencies": {
+    "@google/genai": "^1.40.0",
+    "@modelcontextprotocol/sdk": "latest",
+    "axios": "latest",
+    "dotenv": "latest",
+    "express": "latest",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "dotenv-cli": "^11.0.0",
+    "nodemon": "latest"
+  }
+}
