@@ -822,23 +822,24 @@
 
       const media = document.createElement('div');
       media.className = 'tile-media';
-      // Keep blank media cell for consistent layout.
+      // Cart icon (make it visually obvious this card is the cart).
+      media.innerHTML = `
+        <svg viewBox="0 0 24 24" width="34" height="34" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M7 6h14l-2 9H8L7 6Z" stroke="rgba(4,39,58,0.70)" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M7 6 6.3 3.5H3" stroke="rgba(4,39,58,0.70)" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="9" cy="19" r="1.5" fill="rgba(4,39,58,0.70)"/>
+          <circle cx="18" cy="19" r="1.5" fill="rgba(4,39,58,0.70)"/>
+        </svg>
+      `;
 
       const content = document.createElement('div');
       content.className = 'tile-content';
 
       const title = document.createElement('h4');
-      title.innerText = 'Bag summary';
+      title.innerText = 'Cart Details';
 
       const meta = document.createElement('div');
       meta.className = 'meta';
-
-      const guid = String(s.cartGuid || '').trim();
-      if(guid){
-        const guidLine = document.createElement('div');
-        guidLine.innerHTML = `<b>Cart:</b> ${guid}`;
-        meta.appendChild(guidLine);
-      }
 
       const cartId = String(s.cartId || '').trim();
       if(cartId){
@@ -878,7 +879,7 @@
       const items = Array.isArray(s.items) ? s.items : [];
       if(items.length){
         const itemsTitle = document.createElement('div');
-        itemsTitle.innerHTML = `<b>Items:</b>`;
+        itemsTitle.innerHTML = `<b>Products:</b>`;
         meta.appendChild(itemsTitle);
 
         items.slice(0, 8).forEach(it => {
@@ -915,6 +916,13 @@
 
       const actions = document.createElement('div');
       actions.className = 'tile-actions';
+
+      const checkoutBtn = document.createElement('button');
+      checkoutBtn.type = 'button';
+      checkoutBtn.className = 'primary';
+      checkoutBtn.disabled = true;
+      checkoutBtn.innerText = 'Checkout (future)';
+      actions.appendChild(checkoutBtn);
 
       const refreshBtn = document.createElement('button');
       refreshBtn.type = 'button';
