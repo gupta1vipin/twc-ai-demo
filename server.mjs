@@ -1182,11 +1182,18 @@ app.post('/chat', async (req, res) => {
         const rewriteQueryWithGemini = async (userText) => {
             if (!genAI) return null;
             const prompt = [
-                'Extract a short product search query from the user message.',
+                'Extract a short ecommerce product search query from the user message.',
+                'Goal: improve matching in a keyword-based product catalog search.',
                 'Rules:',
                 '- Return ONLY the query text (no punctuation, no quotes, no explanation)',
-                '- 2 to 5 words',
-                '- Focus on product type + key attribute (example: "zoom camera")',
+                '- 2 to 6 words',
+                '- Include product type (required)',
+                '- Include 1–3 key attributes if present: material, season/occasion, colour, fit/style (example: "lightweight cotton summer shirt")',
+                '- Prefer concrete words over vague ones (use "lightweight" instead of "breathable")',
+                '- If the user asks for a colour (e.g. white, navy, neutral), include it',
+                'Examples:',
+                'User: "I need a soft breathable cotton shirt for summer, preferably white" => "white cotton summer shirt"',
+                'User: "Show me a warm throw for the sofa" => "warm sofa throw"',
                 `User message: ${userText}`
             ].join('\n');
             const response = await geminiGenerateContentLogged({
@@ -1244,7 +1251,7 @@ app.post('/chat', async (req, res) => {
                 `- hasCart: ${Boolean(session.cart?.guid || session.cart?.code)}`,
                 `- lastShownProducts: ${JSON.stringify(contextProducts)}`,
                 'Rules:',
-                '- If user wants to find products, action=search and include a short query (2-5 words).',
+                '- If user wants to find products, action=search and include a short query (2-6 words) with product type + key attributes (material/colour/season) when present.',
                 '- If user says "more", "next", "show more", "search again", use action=more_results (do NOT invent a new query).',
                 '- If user wants a PRODUCT SUMMARY / more info about a specific product, action=product_summary and include sku if present, otherwise include index (1-3) based on first/second/third.',
                 '- If user wants to OPEN / VIEW PRODUCT DETAILS PAGE (PDP) for a specific product, action=product_details and include sku if present, otherwise include index (1-3).',
@@ -2150,7 +2157,8 @@ app.post('/chat', async (req, res) => {
 
             // For natural-language searches, proactively rewrite to a concise keyword query.
             if (!forcedSearch && !wantsRefine && genAI) {
-                const looksNaturalLanguage = /\b(i\s+(want|need|am\s+looking|m\s+looking)|can\s+you|please|for\s+my|something\s+for)\b/i.test(userMessage) || userMessage.split(/\s+/).filter(Boolean).length >= 7;
+                const wordCount = userMessage.split(/\s+/).filter(Boolean).length;
+                const looksNaturalLanguage = /\b(i\s+(want|need|am\s+looking|m\s+looking)|can\s+you|please|for\s+my|something\s+for)\b/i.test(userMessage) || wordCount >= 6;
                 if (looksNaturalLanguage) {
                     try {
                         const rewritten = await rewriteQueryWithGemini(userMessage);
