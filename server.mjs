@@ -4,7 +4,7 @@ import { GoogleGenAI } from "@google/genai";
 import dotenv from 'dotenv';
 import { z } from 'zod';
 import crypto from 'crypto';
-import axios from 'axios';
+import { createLoggedAxios, withExternalLog } from './http_log.mjs';
 import { createCart, addToCart, getCart, checkSapOAuthAndOcc } from './bridge_logic.mjs';
 import { searchProducts as searchTwcProducts } from './twc_search.mjs';
 import { getTwcProductDetails, guessTwcBaseCode } from './twc_product.mjs';
@@ -31,6 +31,28 @@ const geminiApiKey = (process.env.GEMINI_API_KEY || '').trim();
 const genAI = geminiApiKey ? new GoogleGenAI({ apiKey: geminiApiKey }) : null;
 const modelName = process.env.GENAI_MODEL || "gemini-2.5-flash-lite";
 console.log("[DEBUG] Using Gemini model:", modelName);
+
+const axios = createLoggedAxios('SERVER_HTTP');
+
+async function geminiGenerateContentLogged(request, { label = 'generateContent' } = {}) {
+    if (!genAI) throw new Error('Gemini is not configured');
+    const model = String(request?.model || modelName);
+    const contents = Array.isArray(request?.contents) ? request.contents : [];
+    const approxChars = (() => {
+        try {
+            return JSON.stringify(contents).length;
+        } catch {
+            return null;
+        }
+    })();
+
+    return await withExternalLog('GEMINI', { label, model, chars: approxChars ?? '' }, async () => {
+        return await genAI.models.generateContent({
+            ...request,
+            model
+        });
+    });
+}
 
 const serperApiKey = (process.env.SERPER_API_KEY || '').trim();
 const serperUrl = (process.env.SERPER_URL || 'https://google.serper.dev/search').trim();
@@ -842,10 +864,10 @@ app.post('/chat', async (req, res) => {
             ].join('\n');
 
             try {
-                const response = await genAI.models.generateContent({
+                const response = await geminiGenerateContentLogged({
                     model: modelName,
                     contents: [{ role: 'user', parts: [{ text: prompt }] }]
-                });
+                }, { label: 'followup_answer' });
                 const raw = (response.candidates?.[0]?.content?.parts?.[0]?.text || '').trim();
                 if (raw) {
                     return res.json({ reply: raw.replace(/\s+/g, ' ').trim(), products: null });
@@ -1064,10 +1086,10 @@ app.post('/chat', async (req, res) => {
             ].join('\n');
 
             try {
-                const response = await genAI.models.generateContent({
+                const response = await geminiGenerateContentLogged({
                     model: modelName,
                     contents: [{ role: 'user', parts: [{ text: prompt }] }]
-                });
+                }, { label: 'search_summaries' });
                 const raw = (response.candidates?.[0]?.content?.parts?.[0]?.text || '').trim();
                 const parsed = safeParseJson(raw);
                 const rows = Array.isArray(parsed) ? parsed : null;
@@ -1167,10 +1189,10 @@ app.post('/chat', async (req, res) => {
                 '- Focus on product type + key attribute (example: "zoom camera")',
                 `User message: ${userText}`
             ].join('\n');
-            const response = await genAI.models.generateContent({
+            const response = await geminiGenerateContentLogged({
                 model: modelName,
                 contents: [{ role: 'user', parts: [{ text: prompt }] }]
-            });
+            }, { label: 'rewrite_query' });
             const txt = (response.candidates?.[0]?.content?.parts?.[0]?.text || '').trim();
             return txt.replace(/[^\p{L}\p{N}\s_-]+/gu, ' ').replace(/\s+/g, ' ').trim().slice(0, 80);
         };
@@ -1240,10 +1262,10 @@ app.post('/chat', async (req, res) => {
 
             let raw = '';
             try {
-                const response = await genAI.models.generateContent({
+                const response = await geminiGenerateContentLogged({
                     model: modelName,
                     contents: [{ role: 'user', parts: [{ text: prompt }] }]
-                });
+                }, { label: 'intent_classify' });
                 raw = (response.candidates?.[0]?.content?.parts?.[0]?.text || '').trim();
             } catch {
                 return { action: 'unknown' };
@@ -1728,10 +1750,10 @@ app.post('/chat', async (req, res) => {
                     })
                 ].join('\n');
                 try {
-                    const response = await genAI.models.generateContent({
+                    const response = await geminiGenerateContentLogged({
                         model: modelName,
                         contents: [{ role: 'user', parts: [{ text: prompt }] }]
-                    });
+                    }, { label: 'product_summary_enrich' });
                     const raw = (response.candidates?.[0]?.content?.parts?.[0]?.text || '').trim();
                     if (raw) summaryText = raw.replace(/\s+/g, ' ').trim();
                 } catch {
@@ -2348,10 +2370,10 @@ app.post('/chat', async (req, res) => {
                 `User: ${userMessage}`
             ].join('\n');
             try {
-                const response = await genAI.models.generateContent({
+                const response = await geminiGenerateContentLogged({
                     model: modelName,
                     contents: [{ role: 'user', parts: [{ text: prompt }] }]
-                });
+                }, { label: 'smalltalk' });
                 const aiText = (response.candidates?.[0]?.content?.parts?.[0]?.text || '').trim();
                 return res.json({ reply: aiText || 'How can I help you shop today?', products: null });
             } catch {
@@ -2372,10 +2394,10 @@ app.post('/chat', async (req, res) => {
 
         if (genAI) {
             try {
-                const response = await genAI.models.generateContent({
+                const response = await geminiGenerateContentLogged({
                     model: modelName,
                     contents: [{ role: 'user', parts: [{ text: userMessage }] }]
-                });
+                }, { label: 'free_chat' });
                 const aiText = (response.candidates?.[0]?.content?.parts?.[0]?.text || '').trim();
                 return res.json({ reply: aiText || "I didn't catch that — can you rephrase?", products: null });
             } catch {

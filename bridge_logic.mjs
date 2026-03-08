@@ -1,6 +1,8 @@
-import axios from "axios";
+import { createLoggedAxios } from './http_log.mjs';
 import dotenv from "dotenv";
 dotenv.config();
+
+const axios = createLoggedAxios('SAP');
 
 const SAP_BASE_URL = (process.env.SAP_BASE_URL || '').trim();
 const SAP_SITE_ID = (process.env.SAP_SITE_ID || '').trim();

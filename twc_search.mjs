@@ -1,4 +1,6 @@
-import axios from 'axios';
+import { createLoggedAxios } from './http_log.mjs';
+
+const axios = createLoggedAxios('TWC_SEARCH');
 
 const DEFAULT_BASE_URL = 'https://www.thewhitecompany.com';
 const TWC_BASE_URL = (process.env.TWC_BASE_URL || DEFAULT_BASE_URL).trim() || DEFAULT_BASE_URL;

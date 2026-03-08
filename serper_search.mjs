@@ -1,4 +1,6 @@
-import axios from 'axios';
+import { createLoggedAxios } from './http_log.mjs';
+
+const axios = createLoggedAxios('SERPER');
 
 const DEFAULT_SERPER_URL = 'https://google.serper.dev/search';
 

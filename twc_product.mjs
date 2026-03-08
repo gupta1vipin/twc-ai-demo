@@ -1,4 +1,6 @@
-import axios from 'axios';
+import { createLoggedAxios } from './http_log.mjs';
+
+const axios = createLoggedAxios('TWC_PDP');
 
 const DEFAULT_BASE_URL = 'https://www.thewhitecompany.com';
 
