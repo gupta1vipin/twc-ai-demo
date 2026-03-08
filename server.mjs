@@ -1808,11 +1808,22 @@ app.post('/chat', async (req, res) => {
 
             // If a live TWC bag session exists, prefer showing it as a structured basket tile.
             if (TWC_REAL_CART_ENABLED) {
+                const cached = session?.lastTwcBagSummary?.summary || null;
+                const cachedItems = Array.isArray(cached?.items) ? cached.items : [];
+                if (cached && cachedItems.length) {
+                    const reply = intent.action === 'checkout'
+                        ? 'Here’s your basket. Checkout is marked as future in this demo.'
+                        : 'Here’s your basket.';
+                    return res.json({ reply, products: null, cartSummary: cached });
+                }
+
                 const jar = (session?.twcCart && typeof session.twcCart === 'object') ? (session.twcCart.cookies || {}) : {};
                 const hasLiveSession = Boolean(
                     (jar && typeof jar === 'object' && Object.keys(jar).length) ||
+                    Boolean(TWC_CART_COOKIE) ||
                     session?.twcCart?.cartGuid ||
-                    session?.lastTwcCartAdd
+                    session?.lastTwcCartAdd ||
+                    session?.lastTwcBagSummary
                 );
                 if (hasLiveSession) {
                     try {
