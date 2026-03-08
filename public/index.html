@@ -594,6 +594,25 @@
     const resizeHandle = document.getElementById('resizeHandle');
     const micBtn = document.getElementById('micBtn');
 
+    // Session behavior:
+    // - New page load (including Ctrl+Refresh) => new session => fresh cart
+    // - Same open page => same session => add to the same cart
+    const CLIENT_SID = (window.crypto && typeof window.crypto.randomUUID === 'function')
+      ? window.crypto.randomUUID()
+      : (`sid_${Date.now()}_${Math.random().toString(16).slice(2)}`);
+
+    function apiFetch(url, options = {}){
+      const opts = options && typeof options === 'object' ? options : {};
+      const headers = (opts.headers && typeof opts.headers === 'object') ? opts.headers : {};
+      return fetch(url, {
+        ...opts,
+        headers: {
+          ...headers,
+          'X-TWC-AI-DEMO-SID': CLIENT_SID
+        }
+      });
+    }
+
     // Feature toggle: hide multi-select facet filters in chat responses (code remains, UI hidden).
     const SHOW_REFINE_CONTROLS = false;
 
@@ -954,7 +973,7 @@
         refreshBtn.disabled = true;
         const thinking = appendThinking('Refreshing bag');
         try{
-          const res = await fetch('/cart/twc/summary');
+          const res = await apiFetch('/cart/twc/summary');
           const data = await res.json().catch(()=> ({}));
           thinking.remove();
           refreshBtn.disabled = false;
@@ -1103,7 +1122,7 @@
         addBtn.disabled = true;
         const thinking = appendThinking('Adding to cart');
         try{
-          const res = await fetch('/cart/twc/add',{
+          const res = await apiFetch('/cart/twc/add',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
             body:JSON.stringify({ sku: selectedVariant.code, qty: picker.qty || 1, referer: String(sw?.url || '').trim() })
@@ -1142,7 +1161,7 @@
       const sku = String(p.code || '').trim();
       if(!sku) return { ok:false, reason:'missing_sku' };
       try{
-        const res = await fetch('/cart/twc/add',{
+        const res = await apiFetch('/cart/twc/add',{
           method:'POST',
           headers:{'Content-Type':'application/json'},
           body:JSON.stringify({ sku, qty, referer: String(p.url || '').trim() })
@@ -1172,7 +1191,7 @@
       if(!code) return;
       const thinking = appendThinking('Loading variants');
       try{
-        const res = await fetch('/chat',{
+        const res = await apiFetch('/chat',{
           method:'POST',
           headers:{'Content-Type':'application/json'},
           body:JSON.stringify({ message: `add ${code}` })
@@ -1313,7 +1332,7 @@
             return;
           }
 
-          const res = await fetch('/cart/local/add',{
+          const res = await apiFetch('/cart/local/add',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
             body:JSON.stringify({ product: payload })
@@ -1470,7 +1489,7 @@
               return;
             }
 
-            const res = await fetch('/cart/local/add',{
+            const res = await apiFetch('/cart/local/add',{
               method:'POST',
               headers:{'Content-Type':'application/json'},
               body:JSON.stringify({ product: p })
@@ -1679,7 +1698,7 @@
             ...(hasNumber(selected.minPrice) ? { minPrice: selected.minPrice } : {}),
             ...(hasNumber(selected.maxPrice) ? { maxPrice: selected.maxPrice } : {})
           };
-          const res = await fetch('/chat', {
+          const res = await apiFetch('/chat', {
             method:'POST',
             headers:{'Content-Type':'application/json'},
             body: JSON.stringify({ message: 'refine', search: { text: search.text, filters } })
@@ -1785,7 +1804,7 @@
 
       const thinking = appendThinking('Working');
       try{
-        const res = await fetch('/chat',{
+        const res = await apiFetch('/chat',{
           method:'POST',
           headers:{'Content-Type':'application/json'},
           body:JSON.stringify({ message: text })

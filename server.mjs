@@ -39,6 +39,7 @@ console.log('[DEBUG] SERPER_API_KEY:', serperApiKey ? 'SET' : 'NOT SET');
 // Demo-only session store (in-memory; resets on server restart)
 const sessions = new Map();
 const SID_COOKIE = 'twc_ai_demo_sid';
+const SID_HEADER = 'x-twc-ai-demo-sid';
 
 // Optional: enable a live TWC bag/cart add-to-cart call (server-side proxy).
 // This often requires a valid browser session cookie string due to bot protection.
@@ -538,11 +539,20 @@ function parseCookies(header) {
 }
 
 function getSession(req, res) {
+    // Prefer an explicit per-page-load session id header so a browser refresh creates a fresh session.
+    // Falls back to cookie-based session for older clients.
+    const headerSid = String(req.headers?.[SID_HEADER] || '').trim();
     const cookies = parseCookies(req.headers.cookie);
-    let sid = cookies[SID_COOKIE];
+    let sid = headerSid;
+    const sidFromCookie = cookies[SID_COOKIE];
+
+    if (!sid || typeof sid !== 'string' || sid.length < 8) {
+        sid = sidFromCookie;
+    }
+
     if (!sid || typeof sid !== 'string' || sid.length < 8) {
         sid = crypto.randomUUID();
-        // Minimal cookie settings for demo (same-origin)
+        // Only set the cookie if the client did not provide an explicit session id.
         res.setHeader('Set-Cookie', `${SID_COOKIE}=${encodeURIComponent(sid)}; Path=/; SameSite=Lax`);
     }
     if (!sessions.has(sid)) {
