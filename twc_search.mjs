@@ -117,6 +117,49 @@ function normalizeFacets(data) {
     .filter(f => f.code);
 }
 
+function dedupeProducts(products) {
+  const list = Array.isArray(products) ? products : [];
+  const keyOf = (p) => {
+    const key = cleanText(p?.baseCode || p?.code || p?.url);
+    return key ? key.toLowerCase() : '';
+  };
+
+  const out = [];
+  const indexByKey = new Map();
+  for (const p of list) {
+    const key = keyOf(p);
+    if (!key) continue;
+
+    const existingIndex = indexByKey.get(key);
+    if (existingIndex === undefined) {
+      indexByKey.set(key, out.length);
+      out.push(p);
+      continue;
+    }
+
+    // Merge: keep the first occurrence order, but fill in any missing fields.
+    const existing = out[existingIndex];
+    if (!existing) continue;
+    out[existingIndex] = {
+      ...p,
+      ...existing,
+      // Prefer non-empty strings from either side, leaning toward existing.
+      code: cleanText(existing.code) || cleanText(p.code),
+      baseCode: cleanText(existing.baseCode) || cleanText(p.baseCode),
+      name: cleanText(existing.name) || cleanText(p.name),
+      url: cleanText(existing.url) || cleanText(p.url),
+      image: cleanText(existing.image) || cleanText(p.image),
+      price: cleanText(existing.price) || cleanText(p.price),
+      currency: cleanText(existing.currency) || cleanText(p.currency),
+      stock: cleanText(existing.stock) || cleanText(p.stock),
+      averageRating: (typeof existing.averageRating === 'number' && Number.isFinite(existing.averageRating))
+        ? existing.averageRating
+        : ((typeof p.averageRating === 'number' && Number.isFinite(p.averageRating)) ? p.averageRating : null)
+    };
+  }
+  return out;
+}
+
 function buildFacetQ(text, filters = {}) {
   const base = cleanText(text);
   if (!base) return '';
@@ -184,7 +227,7 @@ export async function searchProducts(query, { currentPage = 0, pageSize = 3, fil
   }
 
   const results = Array.isArray(res.data?.results) ? res.data.results : [];
-  const products = results.map(normalizeResult).filter(p => p.code);
+  const products = dedupeProducts(results.map(normalizeResult).filter(p => p.code));
   const facets = normalizeFacets(res.data);
   const pagination = res.data?.pagination || null;
   const currency = res.data?.currentCurrency || null;

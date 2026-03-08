@@ -1774,6 +1774,30 @@ app.post('/chat', async (req, res) => {
             const twcBagUrl = String(process.env.TWC_BAG_URL || 'https://www.thewhitecompany.com/uk/bag').trim();
             const local = formatLocalCart();
 
+            // If a live TWC bag session exists, prefer showing it as a structured basket tile.
+            if (TWC_REAL_CART_ENABLED) {
+                const jar = (session?.twcCart && typeof session.twcCart === 'object') ? (session.twcCart.cookies || {}) : {};
+                const hasLiveSession = Boolean(
+                    (jar && typeof jar === 'object' && Object.keys(jar).length) ||
+                    session?.twcCart?.cartGuid ||
+                    session?.lastTwcCartAdd
+                );
+                if (hasLiveSession) {
+                    try {
+                        const { summary } = await fetchTwcBagSummaryForSession({ session, refererUrl: twcBagUrl });
+                        const items = Array.isArray(summary?.items) ? summary.items : [];
+                        if (items.length) {
+                            const reply = intent.action === 'checkout'
+                                ? 'Here’s your basket. Checkout is marked as future in this demo.'
+                                : 'Here’s your basket.';
+                            return res.json({ reply, products: null, cartSummary: summary });
+                        }
+                    } catch {
+                        // Fall through to SAP/local cart text fallback
+                    }
+                }
+            }
+
             // Prefer SAP cart if it exists; otherwise fall back to local demo cart.
             if (session.cart?.guid || session.cart?.code) {
                 const cart = await getCart(session.cart);

@@ -737,7 +737,30 @@
       content.className = 'tile-content';
 
       const title = document.createElement('h4');
-      title.innerText = p.name || 'Added to bag';
+      const titleWrap = document.createElement('span');
+      titleWrap.style.display = 'inline-flex';
+      titleWrap.style.alignItems = 'center';
+      titleWrap.style.gap = '8px';
+
+      const icon = document.createElement('span');
+      icon.setAttribute('aria-hidden', 'true');
+      icon.style.display = 'inline-flex';
+      icon.style.alignItems = 'center';
+      icon.innerHTML = `
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7 6h14l-2 9H8L7 6Z" stroke="rgba(4,39,58,0.70)" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M7 6 6.3 3.5H3" stroke="rgba(4,39,58,0.70)" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="9" cy="19" r="1.5" fill="rgba(4,39,58,0.70)"/>
+          <circle cx="18" cy="19" r="1.5" fill="rgba(4,39,58,0.70)"/>
+        </svg>
+      `;
+
+      const nameSpan = document.createElement('span');
+      nameSpan.innerText = p.name || 'Added to bag';
+
+      titleWrap.appendChild(icon);
+      titleWrap.appendChild(nameSpan);
+      title.appendChild(titleWrap);
 
       const meta = document.createElement('div');
       meta.className = 'meta';
@@ -779,12 +802,11 @@
       const actions = document.createElement('div');
       actions.className = 'tile-actions';
 
-      const bagBtn = document.createElement('a');
+      const bagBtn = document.createElement('button');
+      bagBtn.type = 'button';
       bagBtn.className = 'primary';
-      bagBtn.innerText = 'Open bag';
-      bagBtn.href = miniCart.bagUrl || '/';
-      bagBtn.target = '_blank';
-      bagBtn.rel = 'noopener';
+      bagBtn.disabled = true;
+      bagBtn.innerText = 'Open bag (future)';
       actions.appendChild(bagBtn);
 
       if(p.url){
@@ -836,7 +858,7 @@
       content.className = 'tile-content';
 
       const title = document.createElement('h4');
-      title.innerText = 'Cart Details';
+      title.innerText = 'MY BASKET';
 
       const meta = document.createElement('div');
       meta.className = 'meta';
@@ -1092,7 +1114,6 @@
             container.remove();
             appendMessage('Added to bag.', 'agent');
             appendMiniCart(data.miniCart);
-            if(data.cartSummary) appendCartSummary(data.cartSummary);
           } else {
             appendMessage(`Live add-to-bag failed${res.status ? ` (${res.status})` : ''}: ${data?.error || res.statusText}`, 'agent');
             addBtn.disabled = false;
@@ -1284,7 +1305,6 @@
           if(live.ok && live.miniCart){
             appendMessage('Added to bag.', 'agent');
             appendMiniCart(live.miniCart);
-            if(live.cartSummary) appendCartSummary(live.cartSummary);
             return;
           }
 
@@ -1788,6 +1808,13 @@
             appendMiniCart(data.miniCart);
           }catch(e){
             appendMessage('Mini cart render error: ' + (e?.message || String(e)), 'agent');
+          }
+        }
+        if(data && data.cartSummary){
+          try{
+            appendCartSummary(data.cartSummary);
+          }catch(e){
+            appendMessage('Basket render error: ' + (e?.message || String(e)), 'agent');
           }
         }
         if(data && data.variantPicker){
